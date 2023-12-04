@@ -33,7 +33,8 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def generate_chart(queries_type: str, first_db_name: str, second_db_name: str, chart_type: str, filename1: str, filename2: str, save_to_file: str):
+def generate_chart(queries_type: str, first_db_name: str, second_db_name: str, chart_type: str, filename1: str,
+                   filename2: str, save_to_file: str):
     # Get frames from csv
     first_frame = pd.read_csv(filename1)
     second_frame = pd.read_csv(filename2)
@@ -71,10 +72,10 @@ def average(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
 def avg_bar(results, labels, queries_type):
     fig, ax = plt.subplots()
     bars = ax.bar(labels, results, color=['blue', 'pink'])
-    
+
     for bar in bars:
         yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), ha='center', va='bottom')
+        ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
 
     plt.ylabel('Time (ms)')
     plt.title('Average query time for each database with ' + queries_type + " queries")
@@ -83,34 +84,44 @@ def avg_bar(results, labels, queries_type):
 
 def faster(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     results = []
-    
-    # comparison_result = first_frame['time'].le(second_frame['time'])
+    rezultz = []
+    first = 0
+    second = 0
+    num_first_rows = len(first_frame)
+    num_second_rows = len(second_frame)
+    # Traverse the csv results
+    while first < num_first_rows and second < num_second_rows:
+        # Compare first_frame execution time in ms with second_frame execution time in ms
+        if first_frame.iloc[first, 3] < second_frame.iloc[second, 3]:
+            results.append(first_frame.iloc[first, :])
+        else:
+            rezultz.append(second_frame.iloc[second, :])
+        # Increase index counters for further traversal
+        first = first + 1
+        second = second + 1
+    # Pack the collected results into a single return list, unpack it in faster_bar function.
+    return [results, rezultz]
 
-    # first_is_faster = comparison_result.sum()
-    # second_is_faster = (~comparison_result).sum()
 
-    first_is_faster = (first_frame['time'].le(second_frame['time'])).sum()
+def faster_bar(results, labels, query_type):
+    bar_width = 0.35
+    index = range(len(labels))
 
-    second_is_faster = (first_frame['time'].le(second_frame['time'])).sum()
+    sizes = [len(results[0]), len(results[1])]
 
-    results.append(first_is_faster)
-    results.append(second_is_faster)
-
-    return results
-
-
-def faster_bar(results, labels, queries_type):
     fig, ax = plt.subplots()
-    bars = ax.bar(labels, results, color=['blue', 'pink'])
-    
+
+    bars = ax.bar(index, sizes, bar_width)
     for bar in bars:
         yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), ha='center', va='bottom')
-    
+        ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
+
+    ax.set_xticks([i for i in index])
+    ax.set_xticklabels(labels)
+
     plt.ylabel('Number of queries')
-    plt.title('Number of faster queries per each database with ' + queries_type + ' queries')
+    plt.title('Number of faster queries per each database with ' + query_type + ' queries')
     plt.show()
- 
 
 
 def timeout(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
@@ -122,16 +133,16 @@ def timeout(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     results.append(count_second)
 
     return results
-    
+
 
 def tout_bar(results, labels, queries_type):
     fig, ax = plt.subplots()
     bars = ax.bar(labels, results, color=['blue', 'pink'])
-    
+
     for bar in bars:
         yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), ha='center', va='bottom')
-    
+        ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
+
     plt.ylabel('Number of timeouts')
     plt.title('Number of timeouts for each database with ' + queries_type + ' queries')
     plt.show()
@@ -144,7 +155,8 @@ def countTimeouts(frame):
 
 if __name__ == '__main__':
     if len(sys.argv) < 8:
-        print("Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
+        print(
+            "Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
         print("""Available chart types are:
  - Average
  - Faster
@@ -154,4 +166,3 @@ if __name__ == '__main__':
 """)
     else:
         generate_chart(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
-
