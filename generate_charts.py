@@ -1,6 +1,6 @@
 # Script to generate the charts from benchmark file.
 #
-# Copyright (c) 2023 Michal Gorlas
+# Copyright (c) 2023 Michal Gorlas, Nedas Adamavicius
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -155,9 +155,9 @@ def countTimeouts(frame):
 
 if __name__ == '__main__':
     if len(sys.argv) < 8:
+        print("Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
         print(
-            "Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
-        print("""Available chart types are:
+            """Available chart types are:
  - Average
  - Faster
  - Timeout
