@@ -147,7 +147,6 @@ def tout_bar(results, labels, queries_type):
     plt.title('Number of timeouts for each database with ' + queries_type + ' queries')
     plt.show()
 
-
 # Helper function
 def countTimeouts(frame):
     return sum(count for status, count in frame['status'].value_counts().items() if status != 'OK')
