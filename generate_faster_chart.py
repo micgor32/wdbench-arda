@@ -55,6 +55,12 @@ def faster_bar(results, labels, save_to_file):
     plt.bar(x - 0.2, y1_flat, width, color='cyan')
     plt.bar(x, y2_flat, width, color='orange')
 
+    for i, value in enumerate(y1_flat):
+        plt.text(x[i] - 0.2, value + 0.1, str(value), ha='center', va='bottom', fontsize=7)
+
+    for i, value in enumerate(y2_flat):
+        plt.text(x[i], value + 0.1, str(value), ha='center', va='bottom', fontsize=7)
+
     plt.xticks(x, ['Single', 'Multiple', 'Opts', 'Paths', 'C2rpqs'])
     plt.xlabel("Query types")
     plt.ylabel("Number of queries")
