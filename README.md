@@ -6,6 +6,7 @@ The benchmark was performed on AWS instances of following specification: ![image
 Here you may find the instructions how we imported the data to both tested databases.
 
 ### Setup Neo4j
+This part assumes you are connected to the AWS instance with at least 24GB of RAM and 350GB of free disk space. Some of the commands may require root access if you are using Amazon Linux as we did.
 #### 1. Download Neo4J
 
 - Download [Neo4J community edition](https://dist.neo4j.org/neo4j-community-4.3.5-unix.tar.gz). We used the version 4.3.5, same that was used in the original run.
