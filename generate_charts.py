@@ -45,16 +45,16 @@ def generate_chart(queries_type: str, first_db_name: str, second_db_name: str, c
 
     if chart_type.lower() == "average":
         results = average(first_frame, second_frame)
-        avg_bar(results, labels, queries_type)
+        avg_bar(results, labels, queries_type, save_to_file)
 
     elif chart_type.lower() == "faster":
         results = faster(first_frame, second_frame)
-        faster_bar(results, labels, queries_type)
+        faster_bar(results, labels, queries_type, save_to_file)
 
     elif chart_type.lower() == "timeout":
         results_tout = timeout(first_frame, second_frame)
         results_success = success(first_frame, second_frame)
-        tout_bar(results_tout, results_success, labels, queries_type)
+        tout_bar(results_tout, results_success, labels, queries_type, save_to_file)
     else:
         print("Invalid chart type " + chart_type)
         sys.exit(1)
@@ -70,7 +70,7 @@ def average(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     return results
 
 
-def avg_bar(results, labels, queries_type):
+def avg_bar(results, labels, queries_type, save_to_file):
     fig, ax = plt.subplots()
     bars = ax.bar(labels, results, color=['blue', 'pink'])
 
@@ -80,7 +80,15 @@ def avg_bar(results, labels, queries_type):
 
     plt.ylabel('Time (ms)')
     plt.title('Average query time for each database with ' + queries_type + " queries")
-    plt.show()
+
+    if save_to_file.lower() == 'y':
+        output_filename = f"{queries_type}_queries_chart.png"
+        plt.savefig(output_filename)
+        print(f"Chart saved to {output_filename}")
+    elif save_to_file.lower() == 'n':
+        plt.show()
+    else:
+        print("Invalid input, must be either 'y' or 'n'")
 
 
 def faster(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
@@ -104,7 +112,7 @@ def faster(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     return [results, rezultz]
 
 
-def faster_bar(results, labels, query_type):
+def faster_bar(results, labels, query_type, save_to_file):
     bar_width = 0.35
     index = range(len(labels))
 
@@ -121,8 +129,16 @@ def faster_bar(results, labels, query_type):
     ax.set_xticklabels(labels)
 
     plt.ylabel('Number of queries')
-    plt.title('Number of faster queries per each database with ' + query_type + ' queries')
-    plt.show()
+    plt.title(f'Number of faster queries per each database with {query_type} queries')
+
+    if save_to_file.lower() == 'y':
+        output_filename = f"{query_type}_queries_chart.png"
+        plt.savefig(output_filename)
+        print(f"Chart saved to {output_filename}")
+    elif save_to_file.lower() == 'n':
+        plt.show()
+    else:
+        print("Invalid input, must be either 'y' or 'n'")
 
 
 def timeout(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
@@ -147,7 +163,7 @@ def success(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     return results
 
 
-def tout_bar(results_tout, results_success, labels, queries_type):
+def tout_bar(results_tout, results_success, labels, queries_type, save_to_file):
     # total_queries = [success + tout for success, tout in zip(results_success, results_tout)]
 
     # success_percent = [(success / total) * 100 for success, total in zip(results_success, total_queries)]
@@ -176,7 +192,14 @@ def tout_bar(results_tout, results_success, labels, queries_type):
     plt.title('Number of queries for each database with ' + queries_type + ' queries')
     plt.legend(['Timeout', 'Success'], loc='upper center', bbox_to_anchor=(0.5, -0.05),
           fancybox=True, shadow=True, ncol=5)
-    plt.show()
+    if save_to_file.lower() == 'y':
+        output_filename = f"{queries_type}_queries_chart.png"
+        plt.savefig(output_filename)
+        print(f"Chart saved to {output_filename}")
+    elif save_to_file.lower() == 'n':
+        plt.show()
+    else:
+        print("Invalid input, must be either 'y' or 'n'")
 
 # Helper function 
 def countTimeouts(frame):
