@@ -3,7 +3,7 @@ This repo contains scripts that we used to recreate [WDBench benchmark](https://
 The benchmark was performed on AWS instances of following specification: ![image](https://github.com/micgor32/wdbench-arda/assets/111281585/18385157-841c-42c5-a1ec-e2a630ca0890)
 
 ## Data import
-Here you may find the instructions how we imported the data to both tested databases.
+Here you may find the instructions how we imported the data to both tested databases. The Wikidata data that we used may be found [here](https://figshare.com/s/50b7544ad6b1f51de060)
 
 ### Setup Neo4j
 This part assumes you are connected to the AWS instance with at least 24GB of RAM and 350GB of free disk space. Some of the commands may require root access if you are using Amazon Linux as we did.
