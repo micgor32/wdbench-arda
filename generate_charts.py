@@ -178,20 +178,7 @@ def tout_bar(results_tout, results_success, labels, queries_type):
           fancybox=True, shadow=True, ncol=5)
     plt.show()
 
-
-    # fig, ax = plt.subplots()
-    # bars = ax.bar(labels, results_tout, color=['blue', 'pink'])
-
-    # for bar in bars:
-    #     yval = bar.get_height()
-    #     ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
-
-    # plt.ylabel('Number of timeouts')
-    # plt.title('Number of timeouts for each database with ' + queries_type + ' queries')
-    # plt.show()
-
-
-# Helper function for counting the timeouts
+# Helper function 
 def countTimeouts(frame):
     return sum(count for status, count in frame['status'].value_counts().items() if status != 'OK')
 
