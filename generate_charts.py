@@ -52,8 +52,9 @@ def generate_chart(queries_type: str, first_db_name: str, second_db_name: str, c
         faster_bar(results, labels, queries_type)
 
     elif chart_type.lower() == "timeout":
-        results = timeout(first_frame, second_frame)
-        tout_bar(results, labels, queries_type)
+        results_tout = timeout(first_frame, second_frame)
+        results_success = success(first_frame, second_frame)
+        tout_bar(results_tout, results_success, labels, queries_type)
     else:
         print("Invalid chart type " + chart_type)
         sys.exit(1)
@@ -135,23 +136,68 @@ def timeout(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
     return results
 
 
-def tout_bar(results, labels, queries_type):
+def success(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
+    results = []
+
+    count_first = countSuccess(first_frame)
+    count_second = countSuccess(second_frame)
+    results.append(count_first)
+    results.append(count_second)
+
+    return results
+
+
+def tout_bar(results_tout, results_success, labels, queries_type):
+    # total_queries = [success + tout for success, tout in zip(results_success, results_tout)]
+
+    # success_percent = [(success / total) * 100 for success, total in zip(results_success, total_queries)]
+
+    # fig, ax = plt.subplots()
+    # ax.pie(success_percent, labels=labels, autopct='%1.1f%%', startangle=90, colors=['limegreen', 'firebrick'])
+    # ax.set_title('Queries Distribution by Database Type')
+    # plt.show()
+
+
     fig, ax = plt.subplots()
-    bars = ax.bar(labels, results, color=['blue', 'pink'])
 
-    for bar in bars:
-        yval = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
+    tout_bar = ax.bar(labels, results_tout, color='firebrick', label='Timeout')
 
-    plt.ylabel('Number of timeouts')
-    plt.title('Number of timeouts for each database with ' + queries_type + ' queries')
+    success_bar = ax.bar(labels, results_success, color='limegreen', label='Successful', bottom=results_tout)
+
+    # for bar in tout_bar:
+    #     yval = bar.get_height()
+    #     ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='top')
+    #
+    # for tout, success in zip(tout_bar, success_bar):
+    #     yval_success = success.get_height() + (tout.get_height() / 2)
+    #     ax.text(success.get_x() + success.get_width() / 2, yval_success, round(success.get_height(), 2), ha='center', va='bottom')
+
+    plt.ylabel('Number of queries')
+    plt.title('Number of queries for each database with ' + queries_type + ' queries')
+    plt.legend(['Timeout', 'Success'], loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=5)
     plt.show()
 
 
-# Helper function
+    # fig, ax = plt.subplots()
+    # bars = ax.bar(labels, results_tout, color=['blue', 'pink'])
+
+    # for bar in bars:
+    #     yval = bar.get_height()
+    #     ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
+
+    # plt.ylabel('Number of timeouts')
+    # plt.title('Number of timeouts for each database with ' + queries_type + ' queries')
+    # plt.show()
+
+
+# Helper function for counting the timeouts
 def countTimeouts(frame):
     return sum(count for status, count in frame['status'].value_counts().items() if status != 'OK')
 
+# Helper function for counting the successful queries
+def countSuccess(frame):
+    return sum(count for status, count in frame['status'].value_counts().items() if status == 'OK')
 
 if __name__ == '__main__':
     if len(sys.argv) < 8:
