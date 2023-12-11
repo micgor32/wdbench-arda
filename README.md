@@ -16,7 +16,7 @@ This part assumes you are connected to the AWS instance with at least 24GB of RA
   - `cd neo4j-community-4.*.*/`
 - Set the variable `$NEO4J_HOME` pointing to the Neo4J folder.
 
-### 2. Edit configuration file
+#### 2. Edit configuration file
 
 Edit the text file `conf/neo4j.conf`
 
@@ -24,11 +24,11 @@ Edit the text file `conf/neo4j.conf`
 - Uncomment the line `dbms.security.auth_enabled=false`
 - Add the line `dbms.transaction.timeout=10m`
 
-### 3. Convert .nt to .csv files
+#### 3. Convert .nt to .csv files
 
 Use the script [nt_to_neo4j.py](https://github.com/MillenniumDB/WDBench/DatabaseGeneration/nt_to_neo4j.py) to generate the .csv files `entities.csv`, `literals.csv` and `edges.csv`
 
-### 4. Bulk import and index
+#### 4. Bulk import and index
 
 Execute the data import
 
@@ -48,3 +48,38 @@ Now we have to create the index for entities:
   - `bin/cypher-shell`, and inside the console run the command:
     - `CREATE INDEX ON :Entity(id);`
     - Even though the above command returns immediately, you have to wait until is finished before interrupting the server. You can see the status of the index with the command `SHOW INDEXES;`.
+
+### Setup Blazegraph
+### 1. Split .nt file into smaller files
+
+Blazegraph can't load big files in a reasonable time, so we need to split the .nt into smaller files (1M each)
+
+- `mkdir splitted_nt`
+- `cd splitted_nt`
+- `split -l 1000000 -a 4 -d --additional-suffix=.nt [path_to_nt]`
+- `cd ..`
+
+### 2. Clone the Git repository and build
+
+- `git clone --recurse-submodules https://gerrit.wikimedia.org/r/wikidata/query/rdf wikidata-query-rdf`
+- `cd wikidata-query-rdf`
+- `mvn package`
+- `cd dist/target`
+- `tar xvzf service-*-dist.tar.gz`
+- `cd service-*/`
+- `mkdir logs`
+
+### 3. Edit the default script
+
+- Edit the script file `runBlazegraph.sh`.
+  - configure main memory here: `HEAP_SIZE=${HEAP_SIZE:-"64g"}` (You may use other value depending on how much RAM your machine has)
+  - set the log folder `LOG_DIR=${LOG_DIR:-"/path/to/logs"}`, replace `/path/to/logs` with the absolute path of the `logs` dir you created in the previous step.
+  - add `-Dorg.wikidata.query.rdf.tool.rdf.RdfRepository.timeout=60` to the `exec java` command to specify the timeout (value is in seconds).
+  - also change `-Dcom.bigdata.rdf.sparql.ast.QueryHints.analyticMaxMemoryPerQuery=0` which removes per-query memory limits.
+
+### 4. Load the splitted data
+
+- Start the server: `./runBlazegraph.sh`
+  - This process won't end until you interrupt it (Ctrl+C). Let this execute until the import ends. Run the next command in another terminal.
+- Start the import: `./loadRestAPI.sh -n wdq -d [path_of_splitted_nt_folder]`
+This step may take a while, on AWS instance that we used, it took around 4 days to finish.
