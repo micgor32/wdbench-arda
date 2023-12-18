@@ -79,7 +79,6 @@ def avg_bar(results, labels, queries_type, save_to_file):
         ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='bottom')
 
     plt.ylabel('Time (ms)')
-    plt.title('Average query time for each database with ' + queries_type + " queries")
 
     if save_to_file.lower() == 'y':
         output_filename = f"{queries_type}_queries_chart.png"
@@ -129,7 +128,6 @@ def faster_bar(results, labels, query_type, save_to_file):
     ax.set_xticklabels(labels)
 
     plt.ylabel('Number of queries')
-    plt.title(f'Number of faster queries per each database with {query_type} queries')
 
     if save_to_file.lower() == 'y':
         output_filename = f"{query_type}_queries_chart.png"
@@ -189,7 +187,6 @@ def tout_bar(results_tout, results_success, labels, queries_type, save_to_file):
     #     ax.text(success.get_x() + success.get_width() / 2, yval_success, round(success.get_height(), 2), ha='center', va='bottom')
 
     plt.ylabel('Number of queries')
-    plt.title('Number of queries for each database with ' + queries_type + ' queries')
     plt.legend(['Timeout', 'Success'], loc='upper center', bbox_to_anchor=(0.5, -0.05),
           fancybox=True, shadow=True, ncol=5)
     if save_to_file.lower() == 'y':

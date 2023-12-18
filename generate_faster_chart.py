@@ -74,8 +74,8 @@ def faster_bar(results, labels, save_to_file):
 
     width = 0.2
 
-    plt.bar(x - 0.2, y1_flat, width, color='cyan')
-    plt.bar(x, y2_flat, width, color='orange')
+    plt.bar(x - 0.2, y1_flat, width, color='blue')
+    plt.bar(x, y2_flat, width, color='pink')
 
     for i, value in enumerate(y1_flat):
         plt.text(x[i] - 0.2, value + 0.1, str(value), ha='center', va='bottom', fontsize=7)
@@ -86,7 +86,6 @@ def faster_bar(results, labels, save_to_file):
     plt.xticks(x, ['Single', 'Multiple', 'Opts', 'Paths', 'C2rpqs'])
     plt.xlabel("Query types")
     plt.ylabel("Number of queries")
-    plt.title('Number of faster queries per each database for each query type')
     plt.legend([labels[0], labels[1]])
 
     if save_to_file.lower() == 'y':
