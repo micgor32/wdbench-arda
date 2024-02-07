@@ -29,6 +29,7 @@
 # Save to file can be either Y or N (case insensitive)
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
@@ -162,33 +163,42 @@ def success(first_frame: pd.DataFrame, second_frame: pd.DataFrame):
 
 
 def tout_bar(results_tout, results_success, labels, queries_type, save_to_file):
-    # total_queries = [success + tout for success, tout in zip(results_success, results_tout)]
-
-    # success_percent = [(success / total) * 100 for success, total in zip(results_success, total_queries)]
-
-    # fig, ax = plt.subplots()
-    # ax.pie(success_percent, labels=labels, autopct='%1.1f%%', startangle=90, colors=['limegreen', 'firebrick'])
-    # ax.set_title('Queries Distribution by Database Type')
-    # plt.show()
-
+    n_groups = len(labels)
+    index = np.arange(n_groups)
+    bar_width = 0.35
 
     fig, ax = plt.subplots()
 
-    tout_bar = ax.bar(labels, results_tout, color='firebrick', label='Timeout')
+    tout_bars = ax.bar(index - bar_width / 2, results_tout, bar_width,
+                       color='firebrick', label='Timeout')
 
-    success_bar = ax.bar(labels, results_success, color='limegreen', label='Successful', bottom=results_tout)
+    success_bars = ax.bar(index + bar_width / 2, results_success, bar_width,
+                          color='limegreen', label='OK')
 
-    # for bar in tout_bar:
-    #     yval = bar.get_height()
-    #     ax.text(bar.get_x() + bar.get_width() / 2, yval, round(yval, 2), ha='center', va='top')
-    #
-    # for tout, success in zip(tout_bar, success_bar):
-    #     yval_success = success.get_height() + (tout.get_height() / 2)
-    #     ax.text(success.get_x() + success.get_width() / 2, yval_success, round(success.get_height(), 2), ha='center', va='bottom')
+    for bar in tout_bars:
+        height = bar.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 1),
+                    textcoords="offset points",
+                    ha='center', va='bottom')
 
-    plt.ylabel('Number of queries')
-    plt.legend(['Timeout', 'Success'], loc='upper center', bbox_to_anchor=(0.5, -0.05),
-          fancybox=True, shadow=True, ncol=5)
+    for bar in success_bars:
+        height = bar.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 1),
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+    ax.set_ylabel('Number of Queries')
+    ax.set_xticks(index)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    plt.legend(['Timeout', 'OK'], loc='upper center', bbox_to_anchor=(0.5, -0.05),
+               fancybox=True, shadow=True, ncol=5)
+
     if save_to_file.lower() == 'y':
         output_filename = f"{queries_type}_queries_chart.png"
         plt.savefig(output_filename)
@@ -198,17 +208,20 @@ def tout_bar(results_tout, results_success, labels, queries_type, save_to_file):
     else:
         print("Invalid input, must be either 'y' or 'n'")
 
-# Helper function 
+# Helper function
 def countTimeouts(frame):
     return sum(count for status, count in frame['status'].value_counts().items() if status != 'OK')
+
 
 # Helper function for counting the successful queries
 def countSuccess(frame):
     return sum(count for status, count in frame['status'].value_counts().items() if status == 'OK')
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 8:
-        print("Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
+        print(
+            "Usage: python3 generate_charts.py <queries_type> <first_db_name> <second_db_name> <chart_type> <path_to_csv> <path_to_csv> <save_to_file>")
         print(
             """Available chart types are:
  - Average
